@@ -29,5 +29,15 @@ func main() {
 	fmt.Println("Length", len(number))
 	fmt.Println("Capacity", cap(number))
 
+	/*
+		To create a slice with no initial values and of 0 lenght you can use the make function
+		ini := make([]int, 0)
+		Example given below
+	*/
+
+	ini := make([]int, 0)
+	fmt.Println("Slice", ini)
+	fmt.Println("Length", len(ini))
+	fmt.Println("Capacity", cap(ini))
 
 }
