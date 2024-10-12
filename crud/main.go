@@ -66,15 +66,18 @@ func performGetRequest() {
 	fmt.Println("Data is:", todo)
 }
 
-
 /*
-	This is a function for sending post request using go
-	- First create a object with data for sending
-	- convert the struct object into json, as the post request can be done in form "Application/JSON"
-	- for sending post request, we need json string and a reader 
-		- use string(jsonData) to convert json []byte into a string
-		- use strings.NewReader() to create a Reader
-	- Send a post request to the url and handle error and show result
+This is a function for sending post request using go
+- First create a object with data for sending
+- convert the struct object into json, as the post request can be done in form "Application/JSON"
+- for sending post request, we need json string and a reader
+  - use string(jsonData) to convert json []byte into a string
+  - use strings.NewReader() to create a Reader
+
+- Send a post request to the url and handle error and show result
+- result can be shown in 2 ways
+  - status
+  - data (using io.ReadAll() and converting the result to string)
 */
 func performPostRequest() {
 	data := Todo{
@@ -100,11 +103,55 @@ func performPostRequest() {
 		fmt.Println("Error during request:", er)
 		return
 	}
+	defer res.Body.Close()
 
 	// Showing the status code
 	// fmt.Println("Status Code:", res.Status)
 
 	// Showing the data recieved
+	// we are using io.ReadAll to convert the data into json and show output
+	resBody, _ := io.ReadAll(res.Body)
+	fmt.Println("data is:", string(resBody))
+}
+
+/*
+This is a functin for sending put request using go
+*/
+func performUpdateRequest() {
+	data := Todo{
+		UserId:    1,
+		Title:     "Gourab Das learn go",
+		Completed: false,
+	}
+
+	jsonData, err := json.Marshal(data)
+	if err != nil {
+		fmt.Println("Error while marshalling:", err)
+		return
+	}
+
+	jsonString := string(jsonData)
+
+	jsonReader := strings.NewReader(jsonString)
+
+	myURI := "https://jsonplaceholder.typicode.com/posts/1"
+
+	req, er := http.NewRequest(http.MethodPut, myURI, jsonReader)
+	if er != nil {
+		fmt.Println("Error is:", er)
+		return
+	}
+	req.Header.Set("Content-type", "application/json")
+
+	client := http.Client{}
+
+	res, err := client.Do(req)
+	if err != nil {
+		fmt.Println("Error is:", er)
+		return
+	}
+	defer res.Body.Close()
+
 	resBody, _ := io.ReadAll(res.Body)
 	fmt.Println("data is:", string(resBody))
 }
@@ -112,5 +159,6 @@ func performPostRequest() {
 func main() {
 	fmt.Println("CRUD")
 	// performGetRequest()
-	performPostRequest()
+	// performPostRequest()
+	performUpdateRequest()
 }
