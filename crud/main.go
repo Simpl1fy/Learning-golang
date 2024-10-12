@@ -115,7 +115,14 @@ func performPostRequest() {
 }
 
 /*
-This is a functin for sending put request using go
+	This is a functin for sending put request using go
+	- Create a data of type struct
+	- Marshal the data into a json object
+	- Create a new request of type PUT, set header of the request
+	- Create a new client to perform the request
+	- perform the request using client.Do{}
+	- handle error and close the connection to handle memory
+	- print the result
 */
 func performUpdateRequest() {
 	data := Todo{
@@ -156,9 +163,43 @@ func performUpdateRequest() {
 	fmt.Println("data is:", string(resBody))
 }
 
+/*
+	Function for performing a DELETE request using go
+	- Set up url
+	- create a new request using http.NewRequest Method the reader will be nil, as there is no data being read
+	- handle errors during request creation
+	- create a client
+	- using client.Do(req) perform the delete request
+	- handle errors during response
+	- close the body of the response using defer keyword
+	- print the status code as result
+*/
+func performDeleteRequest() {
+	myURI := "https://jsonplaceholder.typicode.com/posts/1"
+
+	req, err := http.NewRequest(http.MethodDelete, myURI, nil)
+	if err != nil {
+		fmt.Println("Error creating request:", err)
+		return
+	}
+	// Do not need to set header as we are not sending data
+
+	client := http.Client{}
+
+	res, err := client.Do(req)
+	if err != nil {
+		fmt.Println("Error sending response:", err)
+		return
+	}
+	defer res.Body.Close()
+
+	fmt.Println("Status Code:", res.Status)
+}
+
 func main() {
 	fmt.Println("CRUD")
 	// performGetRequest()
 	// performPostRequest()
-	performUpdateRequest()
+	// performUpdateRequest()
+	performDeleteRequest()
 }
