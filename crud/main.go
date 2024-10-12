@@ -3,7 +3,9 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"io"
 	"net/http"
+	"strings"
 )
 
 type Todo struct {
@@ -64,7 +66,51 @@ func performGetRequest() {
 	fmt.Println("Data is:", todo)
 }
 
+
+/*
+	This is a function for sending post request using go
+	- First create a object with data for sending
+	- convert the struct object into json, as the post request can be done in form "Application/JSON"
+	- for sending post request, we need json string and a reader 
+		- use string(jsonData) to convert json []byte into a string
+		- use strings.NewReader() to create a Reader
+	- Send a post request to the url and handle error and show result
+*/
+func performPostRequest() {
+	data := Todo{
+		UserId:    1,
+		Title:     "Gourab Das",
+		Completed: true,
+	}
+
+	jsonData, err := json.Marshal(data)
+	if err != nil {
+		fmt.Println("Error marshalling data:", err)
+		return
+	}
+
+	jsonString := string(jsonData)
+
+	jsonReader := strings.NewReader(jsonString)
+
+	myURI := "https://jsonplaceholder.typicode.com/posts"
+
+	res, er := http.Post(myURI, "Application/JSON", jsonReader)
+	if er != nil {
+		fmt.Println("Error during request:", er)
+		return
+	}
+
+	// Showing the status code
+	// fmt.Println("Status Code:", res.Status)
+
+	// Showing the data recieved
+	resBody, _ := io.ReadAll(res.Body)
+	fmt.Println("data is:", string(resBody))
+}
+
 func main() {
 	fmt.Println("CRUD")
 	// performGetRequest()
+	performPostRequest()
 }
